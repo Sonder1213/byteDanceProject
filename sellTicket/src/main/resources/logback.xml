@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="warContextName" value="gateway"/>
+    <contextName>${warContextName}</contextName>>
+    <appender name="logfile_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <!--            匹配的日志写入文件-->
+            <onMatch>ACCEPT</onMatch>
+            <!--            不匹配的不写入文件-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!--        谨慎模式  多个fileAppender同时向同一个文件中写日志时 不会出错具体百度吧-->
+        <Prudent>true</Prudent>
+        <!--        按时间段进行写入策略 其他的还有按文件大小的策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                <!--                文件名称-->
+                sellTicket/logs/error/${HOSTNAME}.${CONTEXT_NAME}.%d{yyyy-MM-dd-HH}.error.log
+            </FileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                <!--                文件中记录日志的格式-->
+                %d{HH:mm:ss.SSS} [%thread] %.-1level %logger{32} - %msg %n
+            </Pattern>
+        </encoder>
+    </appender>
+    <appender name="logfile_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <Prudent>true</Prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                sellTicket/logs/info/${HOSTNAME}.${CONTEXT_NAME}.%d{yyyy-MM-dd-HH}.info.log
+            </FileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                %d{HH:mm:ss.SSS} [%thread] %.-1level %logger{32} - %msg %n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="logfile_debug" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <appender name="_logfile_debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+            <Prudent>true</Prudent>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>
+                    sellTicket/logs/debug/${HOSTNAME}.${CONTEXT_NAME}.%d{yyyy-MM-dd-HH}-%i.debug.log
+                </FileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>800MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
+            <encoder>
+                <Pattern>
+                    %d{HH:mm:ss.SSS} [%thread] %.-1level %logger{32} - %msg %n
+                </Pattern>
+            </encoder>
+        </appender>
+    </appender>
+    <!--控制台输出的格式-->
+    <appender name="logfile_console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+            </Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+    </appender>
+
+    <!--    对具体包进行日志的输出设置-->
+    <logger name="com.mpt.slf4jdemo" level="DEBUG"/>
+    <!--    <logger name="ht" level="DEBUG" />-->
+    <logger name="root" level="INFO">
+        <appender-ref ref="logfile_error"/>
+        <appender-ref ref="logfile_debug"/>
+        <appender-ref ref="logfile_info"/>
+        <appender-ref ref="logfile_console"/>
+    </logger>
+</configuration>
