@@ -58,45 +58,35 @@ public class Test03 {
         }
 
         NioEventLoopGroup group = new NioEventLoopGroup();
-        try {
-            InetSocketAddress address = new InetSocketAddress("127.0.0.1", 6667);
-            Bootstrap bootstrap = new Bootstrap().channel(NioSocketChannel.class)
-                    .group(group)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.TCP_NODELAY, true);
-            ClientHandler2 handler = new ClientHandler2();
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    ChannelPipeline pipeline = socketChannel.pipeline();
-                    pipeline.addLast(new CommonEncode());
-                    pipeline.addLast(new CommonDecode());
-                    pipeline.addLast(handler);
-                }
-            }).connect(address).sync().addListener(future -> {
-                if (future.isSuccess()) {
-                    System.out.println("连接成功");
-                } else {
-                    System.out.println("连接失败");
-                }
-            });
+        InetSocketAddress address = new InetSocketAddress("127.0.0.1", 6666);
+        Bootstrap bootstrap = new Bootstrap().channel(NioSocketChannel.class)
+                .group(group)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.TCP_NODELAY, true);
+        ClientHandler2 handler = new ClientHandler2();
+        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            protected void initChannel(SocketChannel socketChannel) throws Exception {
+                ChannelPipeline pipeline = socketChannel.pipeline();
+                pipeline.addLast(new CommonEncode());
+                pipeline.addLast(new CommonDecode());
+                pipeline.addLast(handler);
+            }
+        }).connect(address);
 
-            ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(10);
-            AtomicInteger temp = new AtomicInteger(100000);
-            scheduledThreadPool.scheduleAtFixedRate(() -> {
-                int count = 1700;
-                while (count-- > 0 && temp.getAndDecrement() > 0) {
-                    int finalTemp = temp.get();
-                    Request request = new Request();
-                    request.setTicketId(1L);
-                    request.setToken(arr.get(finalTemp));
-                    request.setId(UUID.randomUUID().toString());
-                    handler.sendRequest(request);
-                    handler.add(request);
-                }
-            }, 1, 1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(10);
+        AtomicInteger temp = new AtomicInteger(100000);
+        scheduledThreadPool.scheduleAtFixedRate(() -> {
+            int count = 1700;
+            while (count-- > 0 && temp.getAndDecrement() > 0) {
+                int finalTemp = temp.get();
+                Request request = new Request();
+                request.setTicketId(1L);
+                request.setToken(arr.get(finalTemp));
+                request.setId(UUID.randomUUID().toString());
+                handler.sendRequest(request);
+                handler.add(request);
+            }
+        }, 1, 1, TimeUnit.SECONDS);
     }
 }
