@@ -4,8 +4,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://116.62.229.44:3306/bytedanceproject?useSSL=false&serverTimezone=UTC
-    username: root
-    password: 12345678
+    username:
+    password:
   redis:
     host: 127.0.0.1
     port: 6379
@@ -15,11 +15,9 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
-  jackson:
-    default-property-inclusion: non_null # JSON处理时忽略非空字段
   rabbitmq:
     virtual-host: /
-    host: 116.62.229.44
-    port: 5672
-    username: guest
-    password: 123456
+    host:
+    port:
+    username:
+    password:
